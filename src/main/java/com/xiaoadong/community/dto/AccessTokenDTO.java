@@ -1,5 +1,8 @@
 package com.xiaoadong.community.dto;
 
+/**
+ * github 需要的数据
+ */
 public class AccessTokenDTO {
     private String client_id;
     private String client_secret;

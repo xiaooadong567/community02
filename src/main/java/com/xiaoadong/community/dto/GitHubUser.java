@@ -1,5 +1,8 @@
 package com.xiaoadong.community.dto;
 
+/**
+ * github author对象 拿到的数据
+ */
 public class GitHubUser {
     private String name;
     private Long id;

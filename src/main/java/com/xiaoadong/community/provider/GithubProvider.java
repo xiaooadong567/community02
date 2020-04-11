@@ -11,6 +11,7 @@ import java.io.IOException;
 @Component
 public class GithubProvider {
     public String getAccessToken(AccessTokenDTO accessTokenDTO) {
+        //拿到 author 的数据去截取，因为数据不是json格式的。
         MediaType mediaType = MediaType.get("application/json; charset=utf-8");
         OkHttpClient client = new OkHttpClient();
 
@@ -29,7 +30,11 @@ public class GithubProvider {
         return null;
     }
 
-
+    /**
+     * 去执行 拿到需要的数据
+     * @param accessToken
+     * @return
+     */
     public GitHubUser getUser(String accessToken) {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
