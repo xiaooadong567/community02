@@ -1,13 +1,19 @@
 package com.xiaoadong.community.controller;
 
+import com.xiaoadong.community.dto.QuestionsDTO;
+import com.xiaoadong.community.mapper.QuesstionMapper;
+import com.xiaoadong.community.model.Question;
 import com.xiaoadong.community.model.User;
 import com.xiaoadong.community.mapper.UserMapper;
+import com.xiaoadong.community.service.QuestionService;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Controller
 public class IndexController {
@@ -15,10 +21,14 @@ public class IndexController {
     @Resource
     private UserMapper userMapper;
 
+    @Resource
+    private QuestionService questionService;
+
 
     @GetMapping({"/", "index"})
-    public String index(HttpServletRequest request) {
-        //验证cookies信息
+    public String index(HttpServletRequest request, Model model) {
+
+        //获取user信息 验证cookies信息
         Cookie[] cookies = request.getCookies();
         if (cookies != null) { // 判断不为空 避免空指针
             for (Cookie cookie : cookies) { // 循环cookies数组
@@ -34,6 +44,10 @@ public class IndexController {
                 }
             }
         }
+
+        //展示数据
+        List<QuestionsDTO> questionList = questionService.list();
+        model.addAttribute("questions",questionList);
         return "index";
     }
 }
