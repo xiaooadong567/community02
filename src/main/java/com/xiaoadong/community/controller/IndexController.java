@@ -1,5 +1,6 @@
 package com.xiaoadong.community.controller;
 
+import com.xiaoadong.community.dto.PaginationDTO;
 import com.xiaoadong.community.dto.QuestionsDTO;
 import com.xiaoadong.community.mapper.QuesstionMapper;
 import com.xiaoadong.community.model.Question;
@@ -9,6 +10,7 @@ import com.xiaoadong.community.service.QuestionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
@@ -26,7 +28,10 @@ public class IndexController {
 
 
     @GetMapping({"/", "index"})
-    public String index(HttpServletRequest request, Model model) {
+    public String index(HttpServletRequest request,
+                        Model model,
+                        @RequestParam(name = "page",defaultValue = "1")Integer page,
+                        @RequestParam(name = "size",defaultValue = "2")Integer size) {
 
         //获取user信息 验证cookies信息
         Cookie[] cookies = request.getCookies();
@@ -46,8 +51,8 @@ public class IndexController {
         }
 
         //展示数据
-        List<QuestionsDTO> questionList = questionService.list();
-        model.addAttribute("questions",questionList);
+        PaginationDTO pagination = questionService.list(page,size);
+        model.addAttribute("pagination",pagination);
         return "index";
     }
 }

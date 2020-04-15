@@ -19,17 +19,23 @@
     </properties>
 
     <dependencies>
+
+
+
+        <!--lombok-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.12</version>
         </dependency>
 
+        <!--springboot-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
+        <!--连接池-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
@@ -74,7 +80,7 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.68</version>
         </dependency>
-
+        <!--mysql数据库-->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -87,6 +93,15 @@
             <artifactId>mybatis-spring-boot-starter</artifactId>
             <version>2.1.1</version>
         </dependency>
+
+        <!-- 热部署 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <version>2.2.6.RELEASE</version>
+            <optional>true</optional>
+        </dependency>
+
 
 
     </dependencies>
