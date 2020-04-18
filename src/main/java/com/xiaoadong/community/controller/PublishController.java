@@ -1,7 +1,6 @@
 package com.xiaoadong.community.controller;
 
 import com.xiaoadong.community.mapper.QuesstionMapper;
-import com.xiaoadong.community.mapper.UserMapper;
 import com.xiaoadong.community.model.Question;
 import com.xiaoadong.community.model.User;
 import org.springframework.stereotype.Controller;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
@@ -19,9 +17,6 @@ public class PublishController {
 
     @Resource
     private QuesstionMapper quesstionMapper;
-
-    @Resource
-    private UserMapper userMapper;
 
     @GetMapping("/publish")
     public String publish() {
@@ -56,24 +51,7 @@ public class PublishController {
             return "publish";
         }
 
-
-        //cookie 拿用户信息
-        User user = null;
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) { // 判断不为空 避免空指针
-            for (Cookie cookie : cookies) { // 循环cookies数组
-                if (cookie.getName().equals("token")) { // 判断cookie信息
-                    String token = cookie.getValue(); // 获取cookies
-                    user = userMapper.findByToken(token); // mapper接口
-                    if (user != null) {
-                        //添加到session中
-                        request.getSession().setAttribute("user", user);
-                    }
-
-                    break;
-                }
-            }
-        }
+        User user = (User) request.getSession().getAttribute("user");
         //用户没有登录
         if (user ==null) {
             model.addAttribute("error","用户未登录");
