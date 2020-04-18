@@ -3,8 +3,8 @@ package com.xiaoadong.community.controller;
 import com.xiaoadong.community.model.User;
 import com.xiaoadong.community.dto.AccessTokenDTO;
 import com.xiaoadong.community.dto.GitHubUser;
-import com.xiaoadong.community.mapper.UserMapper;
 import com.xiaoadong.community.provider.GithubProvider;
+import com.xiaoadong.community.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -33,7 +33,7 @@ public class AuthorizeController {
     private String redirectUri;
 
     @Resource
-    private UserMapper userMapper;
+    private UserService userService;
 
     @GetMapping("/callback")
     public String callback(@RequestParam(name = "code") String code,
@@ -59,17 +59,26 @@ public class AuthorizeController {
             user.setToken(token);
             user.setName(githubUser.getName());
             user.setAccountId(String.valueOf(githubUser.getId()));
-            user.setGmtCreate(System.currentTimeMillis());
-            user.setGmtModified(user.getGmtCreate());
             user.setAvatarUrl(githubUser.getAvatar_url());
-            userMapper.insert(user);
+            userService.createOrUpdate(user);
             //登录成功，写cookie 和session
-            response.addCookie(new Cookie("token",token));
+            response.addCookie(new Cookie("token", token));
             request.getSession().setAttribute("githubUser", githubUser);
             return "redirect:index";
         } else {
-            //登录失败，重新登录
+            //登录失败，主页
             return "redirect:index";
         }
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        // 清除 session ，
+        request.getSession().removeAttribute("user");
+        // 清除 cookie ，
+        Cookie cookie = new Cookie("token", null);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+        return "redirect:index";
     }
 }
