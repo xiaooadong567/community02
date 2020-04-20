@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class QuestionsDTO {
-    private Integer id;
+    private Long id;
     private String title;
     private String description;
     private Long gmtCreate;

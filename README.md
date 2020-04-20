@@ -3,3 +3,4 @@
 ## 资料
 
 ## 工具
+ mvn -Dmybatis.generator.overwrite=true mybatis-generator:generate
