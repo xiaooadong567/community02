@@ -2,10 +2,12 @@ package com.xiaoadong.community.service;
 
 import com.xiaoadong.community.dto.PaginationDTO;
 import com.xiaoadong.community.dto.QuestionsDTO;
-import com.xiaoadong.community.mapper.QuesstionMapper;
+import com.xiaoadong.community.mapper.QuestionMapper;
 import com.xiaoadong.community.mapper.UserMapper;
 import com.xiaoadong.community.model.Question;
+import com.xiaoadong.community.model.QuestionExample;
 import com.xiaoadong.community.model.User;
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -20,13 +22,15 @@ public class QuestionService {
     private UserMapper userMapper;
 
     @Resource
-    private QuesstionMapper quesstionMapper;
+    private QuestionMapper questionMapper;
 
     public PaginationDTO list(Integer page, Integer size) {
         PaginationDTO paginationDTO = new PaginationDTO();
         Integer totalPage;
-        //所有的数量
-        Integer totalCount = quesstionMapper.count();
+        //
+
+        Integer totalCount = (int) questionMapper.countByExample(new QuestionExample());
+
 
         // 总页码
         if (totalCount % size == 0) {
@@ -47,12 +51,12 @@ public class QuestionService {
         paginationDTO.setPagination(totalPage, page);
 
         Integer offset = size * (page - 1);
-        List<Question> questions = quesstionMapper.list(offset, size);
+        List<Question> questions = questionMapper.selectByExampleWithBLOBsWithRowbounds(new QuestionExample(), new RowBounds(offset, size));
         List<QuestionsDTO> questionsDTOList = new ArrayList<>();
 
 
         for (Question question : questions) {
-            User userMapperById = userMapper.findById(question.getCreator());
+            User userMapperById = userMapper.selectByPrimaryKey(question.getCreator());
             QuestionsDTO questionsDTO = new QuestionsDTO();
             BeanUtils.copyProperties(question, questionsDTO);
             questionsDTO.setUser(userMapperById);
@@ -66,7 +70,9 @@ public class QuestionService {
         PaginationDTO paginationDTO = new PaginationDTO();
         Integer totalPage;
         //所有的数量
-        Integer totalCount = quesstionMapper.countByUserId(UserId);
+        QuestionExample questionExample = new QuestionExample();
+        questionExample.createCriteria().andCreatorEqualTo(UserId);
+        Integer totalCount = (int) questionMapper.countByExample(questionExample);
 
         // 总页码
         if (totalCount % size == 0) {
@@ -87,12 +93,14 @@ public class QuestionService {
         paginationDTO.setPagination(totalPage, page);
 
         Integer offset = size * (page - 1);
-        List<Question> questions = quesstionMapper.listByUserId(UserId, offset, size);
+        QuestionExample example =  new QuestionExample();
+        example.createCriteria().andCreatorEqualTo(UserId);
+        List<Question> questions = questionMapper.selectByExampleWithBLOBsWithRowbounds(example, new RowBounds(offset, size));
         List<QuestionsDTO> questionsDTOList = new ArrayList<>();
 
 
         for (Question question : questions) {
-            User userMapperById = userMapper.findById(question.getCreator());
+            User userMapperById = userMapper.selectByPrimaryKey(question.getCreator());
             QuestionsDTO questionsDTO = new QuestionsDTO();
             BeanUtils.copyProperties(question, questionsDTO);
             questionsDTO.setUser(userMapperById);
@@ -103,10 +111,10 @@ public class QuestionService {
     }
 
     public QuestionsDTO getById(Integer id) {
-        Question question = quesstionMapper.getById(id);
+        Question question = questionMapper.selectByPrimaryKey(id);
         QuestionsDTO questionsDTO = new QuestionsDTO();
         BeanUtils.copyProperties(question,questionsDTO);
-        User user = userMapper.findById(question.getCreator());
+        User user = userMapper.selectByPrimaryKey(question.getCreator());
         questionsDTO.setUser(user);
         return questionsDTO;
     }
@@ -114,13 +122,21 @@ public class QuestionService {
     public void createOrUpdate(Question question) {
         if (question.getId() == null) {
             //创建
-            quesstionMapper.create(question);
             question.setGmtCreate(System.currentTimeMillis());
             question.setGmtModified(question.getGmtCreate());
+            questionMapper.insert(question);
         } else{
             // 更新
             question.setGmtModified(question.getGmtCreate());
-            quesstionMapper.update(question);
+            Question updateQuestion = new Question();
+            updateQuestion.setGmtModified(System.currentTimeMillis());
+            updateQuestion.setTitle(question.getTitle());
+            updateQuestion.setDescription(question.getDescription());
+            updateQuestion.setTag(question.getTag());
+            QuestionExample example = new QuestionExample();
+            example.createCriteria().andCreatorEqualTo(question.getId());
+
+            questionMapper.updateByExampleSelective(updateQuestion,example);
         }
     }
 }

@@ -1,8 +1,8 @@
 package com.xiaoadong.community.controller;
 
-import com.xiaoadong.community.model.User;
 import com.xiaoadong.community.dto.AccessTokenDTO;
 import com.xiaoadong.community.dto.GitHubUser;
+import com.xiaoadong.community.model.User;
 import com.xiaoadong.community.provider.GithubProvider;
 import com.xiaoadong.community.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

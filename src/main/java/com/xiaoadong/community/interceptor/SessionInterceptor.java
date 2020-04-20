@@ -2,6 +2,7 @@ package com.xiaoadong.community.interceptor;
 
 import com.xiaoadong.community.mapper.UserMapper;
 import com.xiaoadong.community.model.User;
+import com.xiaoadong.community.model.UserExample;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -10,6 +11,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+
 
 @Service
 public class SessionInterceptor implements HandlerInterceptor {
@@ -24,10 +27,12 @@ public class SessionInterceptor implements HandlerInterceptor {
             for (Cookie cookie : cookies) { // 循环cookies数组
                 if (cookie.getName().equals("token")) { // 判断cookie信息
                     String token = cookie.getValue(); // 获取cookies
-                    User user = userMapper.findByToken(token); // mapper接口
-                    if (user != null) {
+                    UserExample userExample = new UserExample();
+                    userExample.createCriteria().andTokenEqualTo(token);
+                    List<User> users = userMapper.selectByExample(userExample);
+                    if (users.size() != 0) {
                         //添加到session中
-                        request.getSession().setAttribute("user", user);
+                        request.getSession().setAttribute("user", users.get(0));
                     }
 
                     break;
